@@ -135,6 +135,27 @@ func (board Board) Finished() bool {
 	return board.EmptyFor(South) || board.EmptyFor(North)
 }
 
+func (board Board) ScoreFor(player Player) Seeds {
+	score := board[player.Store()]
+	for _, leftover := range player.Pits() {
+		score += board[leftover]
+	}
+	return score
+}
+
+func (board Board) Winner() Player {
+	southScore := board.ScoreFor(South)
+	northScore := board.ScoreFor(North)
+	switch {
+	case southScore > northScore:
+		return South
+	case northScore > southScore:
+		return North
+	default:
+		return -1 // tie
+	}
+}
+
 func (board Board) String() string {
 	return fmt.Sprintf(`
     %3d %3d %3d %3d %3d %3d

@@ -25,6 +25,8 @@ rules that I played by as a kid:
   when your last seed lands in an empty pit
 - game ends when either player's side is empty (i.e., all 6 pits are empty
   after sowing)
+- at the end of the game, each player counts the number of seeds they have
+  combined in their store + pits; the player with the most seeds wins
 
 I'm using this as a toy project to try out [Go](https://golang.org/). The goal
 is to write an AI to play the game perfectly, as I assume the game tree isn't
