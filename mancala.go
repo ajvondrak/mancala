@@ -29,11 +29,34 @@ const (
 	NorthStore
 )
 
+var SouthPits = [...]Pit{
+	SouthPitA,
+	SouthPitB,
+	SouthPitC,
+	SouthPitD,
+	SouthPitE,
+	SouthPitF,
+}
+
+var NorthPits = [...]Pit{
+	NorthPitA,
+	NorthPitB,
+	NorthPitC,
+	NorthPitD,
+	NorthPitE,
+	NorthPitF,
+}
+
 type Seeds int
 
-const numberOfPits = 14
+const (
+	numberOfPlayers = 2
+	pitsPerPlayer   = 6
+	storesPerPlayer = 1
+	boardSize       = numberOfPlayers * (pitsPerPlayer + storesPerPlayer)
+)
 
-type Board [numberOfPits]Seeds
+type Board [boardSize]Seeds
 
 type Turn struct {
 	Board
@@ -55,6 +78,17 @@ func (p Player) Opponent() Player {
 	return 1 - p
 }
 
+func (p Player) Pits() [pitsPerPlayer]Pit {
+	switch p {
+	case South:
+		return SouthPits
+	case North:
+		return NorthPits
+	default:
+		return [pitsPerPlayer]Pit{}
+	}
+}
+
 func (p Player) Store() Pit {
 	switch p {
 	case South:
@@ -67,9 +101,9 @@ func (p Player) Store() Pit {
 }
 
 func (prev Pit) NextFor(player Player) (next Pit) {
-	next = (prev + 1) % numberOfPits
+	next = (prev + 1) % boardSize
 	if next == player.Opponent().Store() {
-		next = (next + 1) % numberOfPits
+		next = (next + 1) % boardSize
 	}
 	return
 }
@@ -86,6 +120,19 @@ func (t Turn) Evaluate() (Board, bool) {
 		}
 	}
 	return board, pit == t.Player.Store()
+}
+
+func (board Board) EmptyFor(player Player) bool {
+	for _, pit := range player.Pits() {
+		if board[pit] > 0 {
+			return false
+		}
+	}
+	return true
+}
+
+func (board Board) Finished() bool {
+	return board.EmptyFor(South) || board.EmptyFor(North)
 }
 
 func (board Board) String() string {

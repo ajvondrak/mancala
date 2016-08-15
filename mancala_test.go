@@ -22,6 +22,24 @@ func TestPlayer_Opponent(t *testing.T) {
 	}
 }
 
+func TestPlayer_Pits(t *testing.T) {
+	cases := []struct {
+		player   Player
+		expected [pitsPerPlayer]Pit
+	}{
+		{South, SouthPits},
+		{North, NorthPits},
+		{0xdeadbeef, [...]Pit{0, 0, 0, 0, 0, 0}},
+	}
+	for _, c := range cases {
+		output := c.player.Pits()
+		if output != c.expected {
+			t.Errorf("%#v.Pits() == %#v, expected %#v",
+				c.player, output, c.expected)
+		}
+	}
+}
+
 func TestPlayer_Store(t *testing.T) {
 	cases := []struct {
 		player   Player
@@ -99,4 +117,26 @@ func ExampleTurn_Evaluate() {
 	//   0                           2
 	//       5   0   5   5   5   1
 	// extra turn: true
+}
+
+func TestBoard_Finished(t *testing.T) {
+	cases := []struct {
+		board    Board
+		expected bool
+	}{
+		{NewBoard(), false},
+		{Board{0, 0, 0, 0, 0, 0, 24, 4, 4, 4, 4, 4, 4, 0}, true},
+		{Board{4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 24}, true},
+		{Board{0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 24}, true},
+		{Board{0, 4, 0, 4, 0, 4, 12, 0, 0, 0, 0, 0, 0, 24}, true},
+		{Board{0, 0, 0, 0, 0, 0, 24, 4, 0, 4, 0, 4, 0, 12}, true},
+		{Board{0, 4, 0, 4, 0, 4, 12, 4, 0, 4, 0, 4, 0, 12}, false},
+	}
+	for _, c := range cases {
+		output := c.board.Finished()
+		if output != c.expected {
+			t.Errorf("%#v.Finished() == %#v, expected %#v",
+				c.board, output, c.expected)
+		}
+	}
 }

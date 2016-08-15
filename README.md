@@ -23,6 +23,8 @@ rules that I played by as a kid:
 - _relay sowing_: if the last seed during sowing lands in an occupied pit,
   continue by collecting & sowing from that pit; this continual re-sowing ends
   when your last seed lands in an empty pit
+- game ends when either player's side is empty (i.e., all 6 pits are empty
+  after sowing)
 
 I'm using this as a toy project to try out [Go](https://golang.org/). The goal
 is to write an AI to play the game perfectly, as I assume the game tree isn't
