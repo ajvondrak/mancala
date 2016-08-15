@@ -1,13 +1,91 @@
-package main
+package mancala
 
 import "fmt"
 
 type Player int
 
-type Board [14]int
+const (
+	South Player = 0
+	North Player = 1
+)
+
+type Pit int
+
+const (
+	SouthPitA Pit = iota
+	SouthPitB
+	SouthPitC
+	SouthPitD
+	SouthPitE
+	SouthPitF
+	SouthStore
+
+	NorthPitA
+	NorthPitB
+	NorthPitC
+	NorthPitD
+	NorthPitE
+	NorthPitF
+	NorthStore
+)
+
+type Seeds int
+
+const numberOfPits = 14
+
+type Board [numberOfPits]Seeds
+
+type Turn struct {
+	Board
+	Player
+	Pit
+}
 
 func NewBoard() Board {
 	return Board{4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 0}
+}
+
+func (board *Board) collect(pit Pit) Seeds {
+	seeds := board[pit]
+	board[pit] = 0
+	return seeds
+}
+
+func (p Player) Opponent() Player {
+	return 1 - p
+}
+
+func (p Player) Store() Pit {
+	switch p {
+	case South:
+		return SouthStore
+	case North:
+		return NorthStore
+	default:
+		return -1
+	}
+}
+
+func (prev Pit) NextFor(player Player) (next Pit) {
+	next = (prev + 1) % numberOfPits
+	if next == player.Opponent().Store() {
+		next = (next + 1) % numberOfPits
+	}
+	return
+}
+
+func (t Turn) Evaluate() (Board, bool) {
+	board := t.Board
+	pit := t.Pit
+	for board[pit] > 1 && pit != t.Player.Store() {
+		seeds := board.collect(pit)
+		for seeds > 0 {
+			pit = pit.NextFor(t.Player)
+			seeds -= 1
+			board[pit] += 1
+		}
+	}
+	return board, pit == t.Player.Store()
 }
 
 func (board Board) String() string {
@@ -16,60 +94,19 @@ func (board Board) String() string {
 %3d                         %3d
     %3d %3d %3d %3d %3d %3d
 `,
-		board[12],
-		board[11],
-		board[10],
-		board[9],
-		board[8],
-		board[7],
-		board[13],
-		board[6],
-		board[0],
-		board[1],
-		board[2],
-		board[3],
-		board[4],
-		board[5],
+		board[NorthPitF],
+		board[NorthPitE],
+		board[NorthPitD],
+		board[NorthPitC],
+		board[NorthPitB],
+		board[NorthPitA],
+		board[NorthStore],
+		board[SouthStore],
+		board[SouthPitA],
+		board[SouthPitB],
+		board[SouthPitC],
+		board[SouthPitD],
+		board[SouthPitE],
+		board[SouthPitF],
 	)
-}
-
-func oppositeStore(player int) int {
-	if player == 0 {
-		return 13
-	}
-	return 6
-}
-
-func nextToSow(player int, previous int) int {
-	next := (previous + 1) % 14
-	if next == oppositeStore(player) {
-		return (next + 1) % 14
-	}
-	return next
-}
-
-func (board *Board) Sow(player, pit int) {
-	start := player*6 + pit
-	seeds := board[start]
-	board[start] = 0
-	sown := start
-	for seeds > 0 {
-		sown = nextToSow(player, sown)
-		seeds -= 1
-		board[sown] += 1
-	}
-	// relay sowing
-	if board[sown] > 1 {
-		fmt.Printf("\n---\n")
-		fmt.Printf(board.String())
-		board.Sow(player, sown)
-	}
-}
-
-func main() {
-	board := NewBoard()
-	fmt.Printf(board.String())
-	board.Sow(0, 0)
-	fmt.Printf("\n---\n")
-	fmt.Printf(board.String())
 }
