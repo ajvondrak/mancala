@@ -4,9 +4,13 @@ import "fmt"
 
 type Seeds int
 
-const boardSize = numberOfPlayers * (pitsPerPlayer + storesPerPlayer)
+const (
+	numberOfPits  = numberOfPlayers * (pitsPerPlayer + storesPerPlayer)
+	seedsPerPit   = 4
+	numberOfSeeds = numberOfPits * seedsPerPit
+)
 
-type Board [boardSize]Seeds
+type Board [numberOfPits]Seeds
 
 func NewBoard() Board {
 	return Board{4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 0}

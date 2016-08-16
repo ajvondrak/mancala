@@ -44,9 +44,9 @@ var NorthPits = [...]Pit{
 }
 
 func (prev Pit) NextFor(player Player) (next Pit) {
-	next = (prev + 1) % boardSize
+	next = (prev + 1) % numberOfPits
 	if next == player.Opponent().Store() {
-		next = (next + 1) % boardSize
+		next = (next + 1) % numberOfPits
 	}
 	return
 }
